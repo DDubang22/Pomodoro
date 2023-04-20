@@ -1,5 +1,5 @@
 # Pomodoro
-Welcome Futter mini Project
+Welcome Flutter mini Project
 
 ## Second mini Project 
 Nomad course abuot Flutter App

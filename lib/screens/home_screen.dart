@@ -9,13 +9,25 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int totalSecond = 1500;
+  static const twentyFiveMinutes = 1500;
+  int totalSecond = twentyFiveMinutes;
+  bool isRunning = false;
+  int totalPomodoros = 0;
   late Timer timer;
 
   void onTick(Timer timer) {
-    setState(() {
-      totalSecond -= 1;
-    });
+    if (totalSecond == 0) {
+      setState(() {
+        totalPomodoros = totalPomodoros + 1;
+        isRunning = false;
+        totalSecond = twentyFiveMinutes;
+      });
+      timer.cancel();
+    } else {
+      setState(() {
+        totalSecond -= 1;
+      });
+    }
   }
 
   void onStartPressed() {
@@ -23,6 +35,21 @@ class _HomeScreenState extends State<HomeScreen> {
       const Duration(seconds: 1),
       onTick,
     );
+    setState(() {
+      isRunning = true;
+    });
+  }
+
+  void onPausePressed() {
+    timer.cancel();
+    setState(() {
+      isRunning = false;
+    });
+  }
+
+  String format(int seconds) {
+    var duration = Duration(seconds: seconds);
+    return duration.toString().split(".").first.substring(2, 7);
   }
 
   @override
@@ -36,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Container(
               alignment: Alignment.bottomCenter,
               child: Text(
-                '$totalSecond',
+                format(totalSecond),
                 style: TextStyle(
                   color: Theme.of(context).cardColor,
                   fontSize: 89,
@@ -51,8 +78,10 @@ class _HomeScreenState extends State<HomeScreen> {
               child: IconButton(
                 iconSize: 110,
                 color: Theme.of(context).cardColor,
-                onPressed: onStartPressed,
-                icon: const Icon(Icons.play_circle_outline),
+                onPressed: isRunning ? onPausePressed : onStartPressed,
+                icon: Icon(isRunning
+                    ? Icons.pause_circle_filled_outlined
+                    : Icons.play_circle_outline),
               ),
             ),
           ),
@@ -82,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   .color),
                         ),
                         Text(
-                          '0',
+                          '$totalPomodoros',
                           style: TextStyle(
                               fontSize: 60,
                               fontWeight: FontWeight.w600,
